@@ -72,6 +72,77 @@ body {
   font-size: 14px;
   color: #6b7280;
 }
+/* Hamburger button - hidden on desktop */
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #166534;
+  cursor: pointer;
+}
+
+/* Mobile Navbar */
+@media (max-width: 768px) {
+  .navbar {
+    height: 65px;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1000;
+  }
+
+  .navbar-logo {
+    font-size: 21px;
+  }
+
+  .navbar-logo-icon {
+    font-size: 23px;
+  }
+
+ .navbar-toggle {
+  display: block;
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #166534;
+  cursor: pointer;
+}
+
+  .navbar-tagline {
+    display: none;
+  }
+
+  .navbar-links {
+    display: none;
+    position: absolute;
+    top: 65px;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .navbar-links.active {
+    display: flex;
+  }
+
+  .navbar-links a {
+    width: 100%;
+    text-align: center;
+    padding: 13px 0;
+    font-size: 16px;
+  }
+
+  .navbar-links a:hover {
+    background: #f0fdf4;
+  }
+}
 
 /* =========================
    HERO
@@ -288,6 +359,28 @@ body {
 .scanner-webcam-button:hover {
   border-color: #15803d;
 }
+/* Scanner mobile alignment */
+@media (max-width: 768px) {
+
+  .scanner-panel h2 {
+    text-align: center;
+  }
+
+  .scanner-placeholder {
+    width: 100%;
+    text-align: center;
+  }
+
+  .scanner-placeholder p {
+    text-align: center;
+  }
+
+  .scanner-placeholder span {
+    display: block;
+    text-align: center;
+  }
+
+}
 
 
 /* =========================
@@ -456,6 +549,61 @@ body {
   .scanner-preview {
     height: 280px;
   }
+}
+/* =========================
+   MOBILE WASTE CARD ALIGNMENT
+========================= */
+
+@media (max-width: 550px) {
+
+  .waste-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .waste-card-header h2 {
+    width: 100%;
+    text-align: center;
+    margin: 0;
+  }
+
+  .confidence-badge {
+    display: inline-block;
+    text-align: center;
+  }
+
+  .waste-card-content {
+    text-align: center;
+  }
+
+  .waste-card-image {
+    margin: 0 auto 12px;
+  }
+
+  .waste-card-content h3 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .waste-card-content > p {
+    text-align: center;
+  }
+
+  .waste-details {
+    text-align: left;
+  }
+
+  .waste-details p {
+    text-align: left;
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
 }
 
 /* =========================
@@ -791,7 +939,25 @@ body {
     grid-column: 2;
   }
 }
+/* =========================
+   MOBILE DASHBOARD ALIGNMENT
+========================= */
 
+@media (max-width: 550px) {
+
+  /* Waste Distribution */
+  .distribution-card h3,
+  .distribution-card .dashboard-card-description {
+    text-align: center;
+  }
+
+  /* Recent Scans */
+  .recent-scans-card h3,
+  .recent-scans-card > .dashboard-card-description {
+    text-align: center;
+  }
+
+}
 /* =========================
    HISTORY
 ========================= */
@@ -1013,6 +1179,34 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: #64748b;
+}
+/* =========================
+   MOBILE ABOUT ALIGNMENT
+========================= */
+
+@media (max-width: 768px) {
+
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .about-content {
+    text-align: center;
+  }
+
+  .about-label {
+    text-align: center;
+  }
+
+  .about-content h2 {
+    text-align: center;
+  }
+
+  .about-content p {
+    text-align: center;
+  }
+
 }
 
 

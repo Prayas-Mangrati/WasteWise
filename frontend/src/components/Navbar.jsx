@@ -1,4 +1,10 @@
+import { useState } from "react";
+
 function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <header className="navbar">
       <div className="navbar-logo">
@@ -6,19 +12,28 @@ function Navbar() {
         <span>WasteWise</span>
       </div>
 
-      <nav className="navbar-links">
-        <a href="#home">Home</a>
-        <a href="#scan">Scan</a>
-        <a href="#dashboard">Dashboard</a>
-        <a href="#history">History</a>
-        <a href="#about">About</a>
+      <button
+        className="navbar-toggle"
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle navigation menu"
+        aria-expanded={menuOpen}
+      >
+        {menuOpen ? "✕" : "☰"}
+      </button>
+
+      <nav className={`navbar-links ${menuOpen ? "active" : ""}`}>
+        <a href="#home" onClick={closeMenu}>Home</a>
+        <a href="#scan" onClick={closeMenu}>Scan</a>
+        <a href="#dashboard" onClick={closeMenu}>Dashboard</a>
+        <a href="#history" onClick={closeMenu}>History</a>
+        <a href="#about" onClick={closeMenu}>About</a>
       </nav>
 
       <div className="navbar-tagline">
         Cleaner Today · Greener Tomorrow
       </div>
     </header>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;
