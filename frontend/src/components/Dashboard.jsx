@@ -1,24 +1,40 @@
 import { useEffect, useState } from "react";
+import API_BASE_URL from "../api";
 
 function Dashboard() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    const loadHistory = () => {
-      const savedHistory =
-        JSON.parse(localStorage.getItem("wastewise_history")) || [];
+  const loadHistory = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/history`);
 
-      setHistory(savedHistory);
-    };
+      if (!response.ok) {
+        throw new Error("Failed to fetch history");
+      }
 
-    loadHistory();
+      const data = await response.json();
+      setHistory(data);
+    } catch (error) {
+      console.error("Failed to load dashboard history:", error);
+      setHistory([]);
+    }
+  };
 
-    window.addEventListener("wastewise-history-updated", loadHistory);
+  loadHistory();
 
-    return () => {
-      window.removeEventListener("wastewise-history-updated", loadHistory);
-    };
-  }, []);
+  window.addEventListener(
+    "wastewise-history-updated",
+    loadHistory
+  );
+
+  return () => {
+    window.removeEventListener(
+      "wastewise-history-updated",
+      loadHistory
+    );
+  };
+}, []);
 
   const getWasteIcon = (wasteClass) => {
     const icons = {
@@ -36,22 +52,37 @@ function Dashboard() {
     return icons[wasteClass] || "♻️";
   };
 
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+
+    const date = new Date(timestamp.replace(" ", "T") + "Z");
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const totalScans = history.length;
 
   const recyclableCount = history.filter(
-    (scan) => scan.recyclable === "Yes" || scan.recyclable === "Yes*",
+    (scan) =>
+      scan.recyclable === "Yes" ||
+      scan.recyclable === "Yes*",
   ).length;
 
   const biodegradableCount = history.filter(
-    (scan) => scan.type === "Biodegradable",
+    (scan) => scan.waste_type === "Biodegradable",
   ).length;
 
   const nonBiodegradableCount = history.filter(
-    (scan) => scan.type === "Non-biodegradable",
+    (scan) => scan.waste_type === "Non-biodegradable",
   ).length;
 
   const distribution = history.reduce((counts, scan) => {
-    counts[scan.class] = (counts[scan.class] || 0) + 1;
+    counts[scan.waste_class] =
+      (counts[scan.waste_class] || 0) + 1;
+
     return counts;
   }, {});
 
@@ -105,6 +136,7 @@ function Dashboard() {
         <div className="dashboard-content">
           <div className="distribution-card">
             <h3>Waste Distribution</h3>
+
             <p className="dashboard-card-description">
               Distribution of waste categories from your scans.
             </p>
@@ -114,14 +146,19 @@ function Dashboard() {
                 <p>No scans yet.</p>
               ) : (
                 distributionItems.map(([wasteClass, count]) => {
-                  const maxCount = distributionItems[0]?.[1] || 1;
-                  const width = (count / maxCount) * 100;
+                  const maxCount =
+                    distributionItems[0]?.[1] || 1;
+
+                  const width =
+                    (count / maxCount) * 100;
 
                   return (
                     <div
                       className="distribution-bar"
                       key={wasteClass}
-                      style={{ width: `${width}%` }}
+                      style={{
+                        width: `${width}%`,
+                      }}
                     >
                       <span>{wasteClass}</span>
                       <strong>{count}</strong>
@@ -134,6 +171,7 @@ function Dashboard() {
 
           <div className="recent-scans-card">
             <h3>Recent Scans</h3>
+
             <p className="dashboard-card-description">
               Your latest waste identification results.
             </p>
@@ -142,15 +180,26 @@ function Dashboard() {
               <p>No scans yet.</p>
             ) : (
               history.slice(0, 4).map((scan) => (
-                <div className="recent-scan-item" key={scan.id}>
-                  <span>{getWasteIcon(scan.class)}</span>
+                <div
+                  className="recent-scan-item"
+                  key={scan.id}
+                >
+                  <span>
+                    {getWasteIcon(scan.waste_class)}
+                  </span>
 
                   <div>
-                    <strong>{scan.class}</strong>
-                    <p>{(scan.confidence * 100).toFixed(0)}% confidence</p>
+                    <strong>{scan.waste_class}</strong>
+
+                    <p>
+                      {(scan.confidence * 100).toFixed(0)}%
+                      {" "}confidence
+                    </p>
                   </div>
 
-                  <small>{scan.time}</small>
+                  <small>
+                    {formatTime(scan.created_at)}
+                  </small>
                 </div>
               ))
             )}

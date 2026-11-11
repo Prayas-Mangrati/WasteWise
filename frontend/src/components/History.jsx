@@ -1,97 +1,157 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
+import API_BASE_URL from "../api";
 
 function History() {
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
-  useEffect(() => {
-    const loadHistory = () => {
-      const savedHistory =
-        JSON.parse(localStorage.getItem("wastewise_history")) || [];
+  const loadHistory = async () => {
+    try {
+      setLoading(true)
+      setError("")
 
-      setHistory(savedHistory);
-    };
+      const response = await fetch(`${API_BASE_URL}/history`)
 
-    loadHistory();
+      if (!response.ok) {
+        throw new Error("Failed to fetch history")
+      }
 
-    window.addEventListener("wastewise-history-updated", loadHistory);
+      const data = await response.json()
+      setHistory(data)
+    } catch (err) {
+      console.error(err)
+      setError("Unable to load scan history.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-    return () => {
-      window.removeEventListener("wastewise-history-updated", loadHistory);
-    };
-  }, []);
+useEffect(() => {
+  loadHistory()
 
-  const getWasteIcon = (wasteClass) => {
+  window.addEventListener(
+    "wastewise-history-updated",
+    loadHistory
+  )
+
+  return () => {
+    window.removeEventListener(
+      "wastewise-history-updated",
+      loadHistory
+    )
+  }
+}, [])
+
+  const getIcon = (wasteClass) => {
     const icons = {
-      Plastic: "🧴",
-      Paper: "📄",
       Cardboard: "📦",
+      "Food Organics": "🍎",
       Glass: "🍾",
       Metal: "🥫",
-      "Food Organics": "🍎",
-      Vegetation: "🌿",
-      "Textile Trash": "👕",
       "Miscellaneous Trash": "🗑️",
-    };
+      Paper: "📄",
+      Plastic: "🧴",
+      "Textile Trash": "👕",
+      Vegetation: "🌿",
+    }
 
-    return icons[wasteClass] || "♻️";
-  };
+    return icons[wasteClass] || "♻️"
+  }
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return ""
+
+    const date = new Date(timestamp.replace(" ", "T") + "Z")
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
 
   return (
     <section className="history-section" id="history">
       <div className="history-container">
+
         <div className="history-heading">
-          <p className="history-label">SCAN RECORDS</p>
-          <h2>Scan History</h2>
-          <p>View your recent waste identification results.</p>
+          <div className="history-label">
+            SCAN HISTORY
+          </div>
+
+          <h2>Your Recent Waste Scans</h2>
+
+          <p>
+            View your previous waste classifications and disposal guidance.
+          </p>
         </div>
 
         <div className="history-card">
+
           <div className="history-header">
-            <span>Waste</span>
-            <span>Confidence</span>
-            <span>Type</span>
-            <span>Recyclable</span>
-            <span>Time</span>
+            <div>WASTE</div>
+            <div>TYPE</div>
+            <div>DISPOSAL</div>
+            <div>RECYCLABLE</div>
+            <div>TIME</div>
           </div>
 
-          {history.length === 0 ? (
+          {loading ? (
             <div className="history-row">
-              <span>No scans yet</span>
-              <span>—</span>
-              <span>—</span>
-              <span>—</span>
-              <span>—</span>
+              <div>Loading scan history...</div>
+            </div>
+          ) : error ? (
+            <div className="history-row">
+              <div>{error}</div>
+            </div>
+          ) : history.length === 0 ? (
+            <div className="history-row">
+              <div>No scans yet.</div>
             </div>
           ) : (
             history.map((scan) => (
               <div className="history-row" key={scan.id}>
+
                 <div className="history-waste">
-                  <span>{getWasteIcon(scan.class)}</span>
-                  <strong>{scan.class}</strong>
+                  <span>{getIcon(scan.waste_class)}</span>
+
+                  <strong>{scan.waste_class}</strong>
                 </div>
 
-                <span>{(scan.confidence * 100).toFixed(0)}%</span>
+                <div>
+                  {scan.waste_type}
+                </div>
 
-                <span>{scan.type}</span>
+                <div>
+                  {scan.disposal}
+                </div>
 
-                <span
-                  className={
-                    scan.recyclable === "No"
-                      ? "history-status history-status-no"
-                      : "history-status"
-                  }
-                >
-                  {scan.recyclable}
-                </span>
+                <div>
+                  <span
+                    className={
+                      scan.recyclable === "Yes" ||
+                      scan.recyclable === "Yes*"
+                        ? "history-status"
+                        : "history-status history-status-no"
+                    }
+                  >
+                    {scan.recyclable}
+                  </span>
+                </div>
 
-                <span>{scan.time}</span>
+                <div>
+                  {formatTime(scan.created_at)}
+                </div>
+
               </div>
             ))
           )}
+
         </div>
+
       </div>
     </section>
-  );
+  )
 }
 
-export default History;
+export default History

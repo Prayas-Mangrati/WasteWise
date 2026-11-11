@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-
+import API_BASE_URL from "../api";
 function Scanner() {
   const fileInputRef = useRef(null);
 
@@ -75,7 +75,7 @@ function Scanner() {
     formData.append("file", selectedFile);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/predict", {
+        const response = await fetch(`${API_BASE_URL}/predict`, {
         method: "POST",
         body: formData,
       });
@@ -85,30 +85,23 @@ function Scanner() {
       }
 
       const data = await response.json();
+
+      if (data.uncertain) {
+        setResult({
+          uncertain: true,
+          confidence: data.confidence,
+          message: data.message,
+          suggestion: data.suggestion,
+        });
+
+        return;
+      }
+
       setResult(data);
-      const newScan = {
-        id: Date.now(),
-        class: data.class,
-        confidence: data.confidence,
-        type: data.type,
-        recyclable: data.recyclable,
-        compostable: data.compostable,
-        disposal: data.disposal,
-        image: preview,
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
 
-      const existingHistory =
-        JSON.parse(localStorage.getItem("wastewise_history")) || [];
-
-      localStorage.setItem(
-        "wastewise_history",
-        JSON.stringify([newScan, ...existingHistory]),
+      window.dispatchEvent(
+        new Event("wastewise-history-updated")
       );
-      window.dispatchEvent(new Event("wastewise-history-updated"));
     } catch (err) {
       setError("Could not connect to WasteWise backend.");
     } finally {
@@ -231,77 +224,117 @@ function Scanner() {
           </div>
 
           {result ? (
-            <>
+              result.uncertain ? (
+                <div className="waste-card-content">
+                  <div className="waste-card-image">
+                    ⚠️
+                  </div>
+
+                  <h3>Uncertain Prediction</h3>
+
+                  <p>
+                    The waste item could not be identified confidently.
+                  </p>
+
+                  <div className="waste-details">
+                    <p>
+                      <strong>Confidence</strong>
+                      <span>
+                        {(result.confidence * 100).toFixed(1)}%
+                      </span>
+                    </p>
+
+                    <p>
+                      <strong>Message</strong>
+                      <span>{result.message}</span>
+                    </p>
+
+                    <p>
+                      <strong>Suggestion</strong>
+                      <span>{result.suggestion}</span>
+                    </p>
+                  </div>
+
+                </div>
+              ) : (
+                <>
+                  <div className="waste-card-content">
+                    <div className="waste-card-image">
+                      {preview ? (
+                        <img
+                          src={preview}
+                          alt={result.class}
+                          className="waste-result-image"
+                        />
+                      ) : (
+                        "♻️"
+                      )}
+                    </div>
+
+                    <h3>{result.class}</h3>
+
+                    <div className="waste-details">
+                      <p>
+                        <strong>Category</strong>
+                        <span>{result.class}</span>
+                      </p>
+
+                      <p>
+                        <strong>Type</strong>
+                        <span>{result.type}</span>
+                      </p>
+
+                      <p>
+                        <strong>Disposal</strong>
+                        <span>{result.disposal}</span>
+                      </p>
+
+                      <p>
+                        <strong>Compostable</strong>
+                        <span>{result.compostable}</span>
+                      </p>
+
+                      <p>
+                        <strong>Recyclable</strong>
+                        <span>{result.recyclable}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="waste-card-actions">
+                    <div className="recycle-box">
+                      ♻️
+                      <strong>
+                        {result.recyclable === "No"
+                          ? "Dispose Properly"
+                          : "Recycle"}
+                      </strong>
+                      <span>
+                        Follow the recommended disposal method
+                      </span>
+                    </div>
+
+                    <div className="warning-box">
+                      🚫
+                      <strong>Don't burn it</strong>
+                      <span>
+                        Follow safe disposal practices
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )
+            ) : (
               <div className="waste-card-content">
-                <div className="waste-card-image">
-                  {preview ? (
-                    <img
-                      src={preview}
-                      alt={result.class}
-                      className="waste-result-image"
-                    />
-                  ) : (
-                    "♻️"
-                  )}
-                </div>
+                <div className="waste-card-image">♻️</div>
 
-                <h3>{result.class}</h3>
+                <h3>No Waste Scanned</h3>
 
-                <div className="waste-details">
-                  <p>
-                    <strong>Category</strong>
-                    <span>{result.class}</span>
-                  </p>
-
-                  <p>
-                    <strong>Type</strong>
-                    <span>{result.type}</span>
-                  </p>
-
-                  <p>
-                    <strong>Disposal</strong>
-                    <span>{result.disposal}</span>
-                  </p>
-
-                  <p>
-                    <strong>Compostable</strong>
-                    <span>{result.compostable}</span>
-                  </p>
-
-                  <p>
-                    <strong>Recyclable</strong>
-                    <span>{result.recyclable}</span>
-                  </p>
-                </div>
+                <p>
+                  Upload an image and analyze it to see the WasteWise result.
+                </p>
               </div>
-
-              <div className="waste-card-actions">
-                <div className="recycle-box">
-                  ♻️
-                  <strong>
-                    {result.recyclable === "No"
-                      ? "Dispose Properly"
-                      : "Recycle"}
-                  </strong>
-                  <span>Follow the recommended disposal method</span>
-                </div>
-
-                <div className="warning-box">
-                  🚫
-                  <strong>Don't burn it</strong>
-                  <span>Follow safe disposal practices</span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="waste-card-content">
-              <div className="waste-card-image">♻️</div>
-
-              <h3>No Waste Scanned</h3>
-
-              <p>Upload an image and analyze it to see the WasteWise result.</p>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </section>

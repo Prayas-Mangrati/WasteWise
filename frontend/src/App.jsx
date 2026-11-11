@@ -7,6 +7,8 @@ import Dashboard from './components/Dashboard'
 import  History from './components/History'
 import About from './components/About'
 
+
+
 function App() {
   return (
     <div className="app">

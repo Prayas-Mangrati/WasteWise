@@ -9,6 +9,7 @@ function Navbar() {
       <nav className="navbar-links">
         <a href="#home">Home</a>
         <a href="#scan">Scan</a>
+        <a href="#dashboard">Dashboard</a>
         <a href="#history">History</a>
         <a href="#about">About</a>
       </nav>

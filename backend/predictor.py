@@ -1,10 +1,12 @@
+from pathlib import Path
 from ultralytics import YOLO
 from waste_info import waste_info
 
 
-MODEL_PATH = "models/best.pt"
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "models" / "best.pt"
 
-model = YOLO(MODEL_PATH)
+model = YOLO(str(MODEL_PATH))
 
 
 def predict_waste(image_path):
