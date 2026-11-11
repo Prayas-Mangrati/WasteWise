@@ -49,20 +49,25 @@ WasteWise currently recognises nine categories:
 ## 🖥️ Application Screenshots
 
 ### Home Page
-![WasteWise Homepage](docs/screenshots/homepage.png)
+![WasteWise Homepage](docs/screenshots/home_page.png)
 
 ### Waste Scanner
-![WasteWise Scanner](docs/screenshots/scanner.png)
+![WasteWise Scanner](docs/screenshots/scanner1.png)
 
 ### Prediction Result
-![WasteWise Prediction](docs/screenshots/prediction.png)
+![WasteWise Prediction](docs/screenshots/scanner2.png)
+
+### Waste Category
+![WasteWise Scanner](docs/screenshots/categories.png)
 
 ### Dashboard
 ![WasteWise Dashboard](docs/screenshots/dashboard.png)
 
 ### Scan History
-![WasteWise History](docs/screenshots/history.png)
+![WasteWise History](docs/screenshots/scan_history.png)
 
+### About Section
+![WasteWise History](docs/screenshots/about_section.png)
 ---
 
 ## 🧠 Machine Learning Model
@@ -206,11 +211,13 @@ WasteWise/
 ├── docs/
 │   ├── WasteWise_Technical_Project_Report.pdf
 │   └── screenshots/
-│       ├── homepage.png
-│       ├── scanner.png
-│       ├── prediction.png
+│       ├── home_page.png
+│       ├── scanner1.png
+│       ├── categories.png
+│       ├── scanner2.png
+│       ├── about_section.png
 │       ├── dashboard.png
-│       └── history.png
+│       └── scan_history.png
 │
 └── README.md
 ```
